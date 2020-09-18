@@ -17,7 +17,7 @@ fi
 
 function usage() {
     cat << _EOF_
-Usage: $0 -s SID [OPTIONS]
+Usage: $0 -s SID -d HOST -u USER -p PASS -t TARGET_DIR [OPTIONS]
 
     OPTIONS:
 
@@ -39,7 +39,7 @@ function main() {
     TARGET_DIR="$arg_target/$DATE"
     DB_EXPORT_ORACLE_SID="export ORACLE_SID=$arg_service_id"
     DB_SQLPLUS_START_SESSION="sqlplus $arg_user/$arg_pass"
-    DB_SQLPLUS_PREPARE_CMD="CREATE DIRECTORY DUMP_$DATE as '$arg_target'; GRANT READ, WRITE ON DIRECTORY DUMP_$DATE TO EXP_FULL_DATABASE; EXIT;"
+    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY DUMP_$DATE as '$arg_target'; GRANT READ, WRITE ON DIRECTORY DUMP_$DATE TO EXP_FULL_DATABASE; EXIT;"
     DB_PREPARE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_PREPARE_CMD | $DB_SQLPLUS_START_SESSION"
     DB_DUMP_CMD="expdp $arg_user/$arg_pass directory=DUMP_$DATE dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
