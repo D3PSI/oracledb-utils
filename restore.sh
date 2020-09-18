@@ -41,7 +41,7 @@ function main() {
     DB_SQLPLUS_START_SESSION="sqlplus $arg_user/$arg_pass"
     DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY DUMP_$DATE as '$arg_target'; GRANT READ, WRITE ON DIRECTORY DUMP_$DATE TO IMP_FULL_DATABASE; EXIT;"
     DB_PREPARE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_PREPARE_CMD | $DB_SQLPLUS_START_SESSION"
-    DB_DUMP_CMD="expdp $arg_user/$arg_pass directory=DUMP_$DATE dumpfile=data.dmp logfile=data.log"
+    DB_DUMP_CMD="impdp $arg_user/$arg_pass directory=DUMP_$DATE dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
