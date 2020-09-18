@@ -14,10 +14,20 @@ if [[ -f $HOME/.bash_profile ]]; then
     . $HOME/.bash_profile
 fi
 
-declare -r _PROGNAME=$(basename $0)
-declare -r _PROGDIR=$(dirname $0)
-declare -r _WORKING_DIR=$(pwd)
+
+function usage() {
+    cat << _EOF_
+Usage: $0 [OPTIONS]
+
+    OPTIONS:
+
+    Examples:
+
+_EOF_
+}
+
 
 function main() {
+    echo "Restoring complete database from local disk..."
 
 }
