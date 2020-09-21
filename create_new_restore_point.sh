@@ -63,23 +63,24 @@ for arg in "$@"; do
         "--db-host") set -- "$@" "-d";;
         "--tenant") set -- "$@" "-t";;
         "--name") set -- "$@" "-n";;
-        *) set -- "$arg"
+        *) set -- "$@" "$arg"
     esac
 done
 
-
+OPTIND=1
 while getopts "hs:d:t:n:" opt
 do
     case "$opt" in
         "h") usage; exit 0;;
-        "s") arg_service_id=${OPTARG}; shift;;
-        "d") arg_db_host=${OPTARG}; shift;;
-        "t") arg_tenant=${OPTARG}; shift;;
-        "n") arg_name=${OPTARG}; shift;;
+        "s") arg_service_id=${OPTARG};;
+        "d") arg_db_host=${OPTARG};;
+        "t") arg_tenant=${OPTARG};;
+        "n") arg_name=${OPTARG};;
         "?") usage >&2; exit 1
     esac
-    shift
 done
+
+shift $(($OPTIND - 1))
 
 if [[ -z "${arg_service_id}" ]]; then
     echo "No service-id specified, exiting..."
