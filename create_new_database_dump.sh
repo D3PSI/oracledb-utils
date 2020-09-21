@@ -42,7 +42,7 @@ function main() {
     OUT_DIR="$arg_out/$DATE"
     DB_EXPORT_ORACLE_SID="export ORACLE_SID=$arg_service_id"
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
-    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY ${arg_tenant}_DUMP_$DATE as '$arg_out'; GRANT READ, WRITE ON DIRECTORY ${arg_tenant}_DUMP_$DATE TO EXP_FULL_DATABASE; EXIT;"
+    DB_SQLPLUS_PREPARE_CMD="'CREATE OR REPLACE DIRECTORY ${arg_tenant}_DUMP_$DATE as "$arg_out"; GRANT READ, WRITE ON DIRECTORY ${arg_tenant}_DUMP_$DATE TO EXP_FULL_DATABASE; EXIT;'"
     DB_PREPARE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_PREPARE_CMD | $DB_SQLPLUS_START_SESSION"
     DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=${arg_tenant}_DUMP_$DATE dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
