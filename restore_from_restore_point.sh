@@ -28,6 +28,10 @@ Usage: $0 -s SID -d HOST -t TENANT -n NAME [OPTIONS]
 
     Examples:
 
+        $0 -s stgholp -t rockbank -n RESTORE_POINT_1
+        $0 --service-id stgholp --tenant rockbank --name RESTORE_POINT_1
+        $0 -s stgholp -t rockbank -n RESTORE_POINT_1 -d ordstg02.revendex.com
+
 _EOF_
 }
 
@@ -65,7 +69,7 @@ done
 
 
 OPTIND=1
-while getopts "hs:d:u:p:t:" opt
+while getopts "hs:d:t:n:" opt
 do
     case "$opt" in
         "h") usage; exit 0;;

@@ -17,17 +17,20 @@ fi
 
 function usage() {
     cat << _EOF_
-Usage: $0 -s SID -d HOST -t TENANT -n NAME -o OUT_DIR [OPTIONS]
+Usage: $0 -s SID -d HOST -t TENANT -o OUT_DIR [OPTIONS]
 
     OPTIONS:
 
         -s, --service-id    :           The Oracle-SID to run the script against (Mandatory)
         -d, --db-host       :           The database host to run the script against (Defaults to localhost if not specified)
         -t, --tenant        :           The tenant to run this script against (Mandatory)
-        -n, --name          :           The name of the restore point (Mandatory)
         -o, --out           :           The out directory where the dump will be stored (Mandatory)
 
     Examples:
+
+        $0 -s stgholp -t rockbank -o /tmp
+        $0 --service-id stgholp --tenant rockbank --out /tmp
+        $0 -s stgholp -t rockbank -o /tmp -d ordstg02.revendex.com
 
 _EOF_
 }
@@ -76,7 +79,7 @@ done
 
 
 OPTIND=1
-while getopts "hs:d:u:p:t:" opt
+while getopts "hs:d:t:o:" opt
 do
     case "$opt" in
         "h") usage; exit 0;;
