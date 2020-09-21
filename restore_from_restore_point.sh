@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #- DATABASE
 #-------------------------------------------------------------------------------
-#- File         : restore.sh
+#- File         : restore_from_restore_point.sh
 #- Description  : Restores a database from a restore point
 #-------------------------------------------------------------------------------
 #- Version      : 1.0
@@ -34,19 +34,15 @@ _EOF_
 
 function main() {
     echo "Restoring complete database from local disk..."
+    DB_EXPORT_ORACLE_SID="export ORACLE_SID=$arg_service_id"
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
-    DB_PREPARE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_PREPARE_CMD | $DB_SQLPLUS_START_SESSION"
-    DB_RESTORE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_PREPARE_CMD | $DB_SQLPLUS_START_SESSION"
+    DB_SQLPLUS_RESTORE_CMD="SHUTDOWN IMMEDIATE; STARTUP MOUNT; FLASHBACK DATABASE TO RESTORE POINT $arg_name; ALTER DATABASE OPEN RESETLOGS; EXIT;"
+    DB_RESTORE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_RESTORE_CMD | $DB_SQLPLUS_START_SESSION"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
     else
         echo "Running on local machine"
-        bash -c "$DB_PREPARE_CMD"
-        if [[ $? -ne 0 ]]; then
-            echo "An unknown error occurred."
-            exit 1
-        fi
         bash -c "$DB_RESTORE_CMD"
         if [[ $? -ne 0 ]]; then
             echo "An unknown error occurred."

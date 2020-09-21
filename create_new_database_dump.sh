@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #- DATABASE
 #-------------------------------------------------------------------------------
-#- File         : dump.sh
+#- File         : create_new_database_dump.sh
 #- Description  : Creates a complete database dump
 #-------------------------------------------------------------------------------
 #- Version      : 1.0
@@ -38,10 +38,10 @@ function main() {
     DATE=$(date +'%Y%m%d')
     OUT_DIR="$arg_out/$DATE"
     DB_EXPORT_ORACLE_SID="export ORACLE_SID=$arg_service_id"
-    DB_SQLPLUS_START_SESSION="sqlplus $arg_user/$arg_pass"
-    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY DUMP_$DATE as '$arg_out'; GRANT READ, WRITE ON DIRECTORY DUMP_$DATE TO EXP_FULL_DATABASE; EXIT;"
+    DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
+    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY ${arg_tenant}_DUMP_$DATE as '$arg_out'; GRANT READ, WRITE ON DIRECTORY ${arg_tenant}_DUMP_$DATE TO EXP_FULL_DATABASE; EXIT;"
     DB_PREPARE_CMD="$DB_EXPORT_ORACLE_SID; $DB_SQLPLUS_PREPARE_CMD | $DB_SQLPLUS_START_SESSION"
-    DB_DUMP_CMD="expdp $arg_user/$arg_pass directory=DUMP_$DATE dumpfile=data.dmp logfile=data.log"
+    DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=${arg_tenant}_DUMP_$DATE dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
@@ -51,7 +51,7 @@ function main() {
         chown oracle:oinstall "$OUT_DIR"
         bash -c "$DB_PREPARE_CMD"
         if [[ $? -ne 0 ]]; then
-            echo "An unknown error occurred. Check that the database user has 'EXP_FULL_DATABASE' role. You can give your database user this role by running the following in sqlplus:\n\n\t\tGRANT EXP_FULL_DATABASE TO $arg_user;"
+            echo "An unknown error occurred. Check that the database user has 'EXP_FULL_DATABASE' role. You can give your database user this role by running the following in sqlplus:\n\n\t\tGRANT EXP_FULL_DATABASE TO $arg_tenant;"
             exit 1
         fi
         bash -c "$DB_DUMP_CMD"
