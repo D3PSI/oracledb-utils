@@ -40,14 +40,13 @@ function main() {
     echo "Restoring complete database from local disk..."
     export ORACLE_SID=$arg_service_id
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
-    DB_SQLPLUS_RESTORE_CMD="'SHUTDOWN IMMEDIATE; STARTUP MOUNT; FLASHBACK DATABASE TO RESTORE POINT $arg_name; ALTER DATABASE OPEN RESETLOGS; EXIT;'"
-    DB_RESTORE_CMD="$DB_SQLPLUS_RESTORE_CMD | $DB_SQLPLUS_START_SESSION"
+    DB_SQLPLUS_RESTORE_CMD="SHUTDOWN IMMEDIATE; STARTUP MOUNT; FLASHBACK DATABASE TO RESTORE POINT $arg_name; ALTER DATABASE OPEN RESETLOGS;"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
     else
         echo "Running on local machine"
-        bash -c "$DB_RESTORE_CMD"
+        eval "echo '"$DB_SQLPLUS_RESTORE_CMD"' | $DB_SQLPLUS_START_SESSION"
         if [[ $? -ne 0 ]]; then
             echo "An unknown error occurred."
             exit 1
