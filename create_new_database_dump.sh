@@ -78,37 +78,35 @@ for arg in "$@"; do
 done
 
 
-OPTIND=1
 while getopts "hs:d:t:o:" opt
 do
     case "$opt" in
         "h") usage; exit 0;;
-        "s") arg_service_id=${OPTARG};;
-        "d") arg_db_host=${OPTARG};;
-        "t") arg_tenant=${OPTARG};;
-        "o") arg_out=${OPTARG};;
+        "s") arg_service_id=${OPTARG}; shift;;
+        "d") arg_db_host=${OPTARG}; shift;;
+        "t") arg_tenant=${OPTARG}; shift;;
+        "o") arg_out=${OPTARG}; shift;;
         "?") usage >&2; exit 1
     esac
+    shift
 done
 
-shift $(expr $OPTIND - 1)
-
-if [[ -z "$arg_service_id" ]]; then
+if [[ -z "${arg_service_id}" ]]; then
     echo "No service-id specified, exiting..."
     exit 1
 fi
 
-if [[ -z "$arg_db_host" ]]; then
+if [[ -z "${arg_db_host}" ]]; then
     echo "No db-host specified, defaulting to 'localhost'..."
     arg_db_host="localhost"
 fi
 
-if [[ -z "$arg_tenant" ]]; then
+if [[ -z "${arg_tenant}" ]]; then
     echo "No tenant specified, exiting..."
     exit 1
 fi
 
-if [[ -z "$arg_out" ]]; then
+if [[ -z "${arg_out}" ]]; then
     echo "No output directory specified, exiting..."
     exit 1
 fi

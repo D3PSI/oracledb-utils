@@ -68,37 +68,35 @@ for arg in "$@"; do
 done
 
 
-OPTIND=1
 while getopts "hs:d:t:n:" opt
 do
     case "$opt" in
         "h") usage; exit 0;;
-        "s") arg_service_id=${OPTARG};;
-        "d") arg_db_host=${OPTARG};;
-        "t") arg_tenant=${OPTARG};;
-        "n") arg_name=${OPTARG};;
+        "s") arg_service_id=${OPTARG}; shift;;
+        "d") arg_db_host=${OPTARG}; shift;;
+        "t") arg_tenant=${OPTARG}; shift;;
+        "n") arg_name=${OPTARG}; shift;;
         "?") usage >&2; exit 1
     esac
+    shift
 done
 
-shift $(expr $OPTIND - 1)
-
-if [[ -z "$arg_service_id" ]]; then
+if [[ -z "${arg_service_id}" ]]; then
     echo "No service-id specified, exiting..."
     exit 1
 fi
 
-if [[ -z "$arg_db_host" ]]; then
+if [[ -z "${arg_db_host}" ]]; then
     echo "No db-host specified, defaulting to 'localhost'..."
     arg_db_host="localhost"
 fi
 
-if [[ -z "$arg_tenant" ]]; then
+if [[ -z "${arg_tenant}" ]]; then
     echo "No tenant specified, exiting..."
     exit 1
 fi
 
-if [[ -z "$arg_name" ]]; then
+if [[ -z "${arg_name}" ]]; then
     echo "No restore point name specified, exiting..."
     exit 1
 fi
