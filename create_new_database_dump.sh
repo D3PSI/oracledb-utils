@@ -40,10 +40,11 @@ function main() {
     echo "Dumping complete database to local disk..."
     DATE=$(date +'%Y%m%d')
     OUT_DIR="$arg_out/$DATE"
+    DB_DIR="${arg_tenant}_DUMP_${DATE}"
     export ORACLE_SID=$arg_service_id
-    DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
-    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY ${arg_tenant}_DUMP_$DATE as "$OUT_DIR";\nGRANT READ, WRITE ON DIRECTORY ${arg_tenant}_DUMP_$DATE TO EXP_FULL_DATABASE;\n"
-    DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=${arg_tenant}_DUMP_$DATE dumpfile=data.dmp logfile=data.log"
+    DB_SQLPLUS_START_SESSION="sqlplus / AS SYSDBA"
+    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY $DB_DIR as '"$OUT_DIR"';\nGRANT READ, WRITE ON DIRECTORY $DB_DIR TO EXP_FULL_DATABASE;\n"
+    DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=$DB_DIR dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1

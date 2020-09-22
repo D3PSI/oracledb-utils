@@ -36,7 +36,7 @@ _EOF_
 
 
 function main() {
-    echo "Restoring complete database from local disk..."
+    echo "Restoring complete database from restore point..."
     export ORACLE_SID=$arg_service_id
     DB_SQLPLUS_START_SESSION="sqlplus / AS SYSDBA"
     DB_SQLPLUS_RESTORE_CMD="SHUTDOWN IMMEDIATE;\nSTARTUP MOUNT;\nFLASHBACK DATABASE TO RESTORE POINT $arg_name;\nALTER DATABASE OPEN RESETLOGS;\n"
