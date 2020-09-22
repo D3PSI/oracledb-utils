@@ -39,13 +39,19 @@ function main() {
     echo "Restoring complete database from restore point..."
     export ORACLE_SID=$arg_service_id
     DB_SQLPLUS_START_SESSION="sqlplus / AS SYSDBA"
-    DB_SQLPLUS_RESTORE_CMD="SHUTDOWN IMMEDIATE;\nSTARTUP MOUNT;\nFLASHBACK DATABASE TO RESTORE POINT $arg_name;\nALTER DATABASE OPEN RESETLOGS;\n"
+    DB_SQLPLUS_RESTORE_CMD_1="SHUTDOWN IMMEDIATE;"
+    DB_SQLPLUS_RESTORE_CMD_2="STARTUP MOUNT;"
+    DB_SQLPLUS_RESTORE_CMD_3="FLASHBACK DATABASE TO RESTORE POINT $arg_name;"
+    DB_SQLPLUS_RESTORE_CMD_4="ALTER DATABASE OPEN RESETLOGS;"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
     else
         echo "Running on local machine"
-        eval "echo '"$DB_SQLPLUS_RESTORE_CMD"' | $DB_SQLPLUS_START_SESSION"
+        eval "echo '"$DB_SQLPLUS_RESTORE_CMD_1"' | $DB_SQLPLUS_START_SESSION"
+        eval "echo '"$DB_SQLPLUS_RESTORE_CMD_2"' | $DB_SQLPLUS_START_SESSION"
+        eval "echo '"$DB_SQLPLUS_RESTORE_CMD_3"' | $DB_SQLPLUS_START_SESSION"
+        eval "echo '"$DB_SQLPLUS_RESTORE_CMD_4"' | $DB_SQLPLUS_START_SESSION"
         if [[ $? -ne 0 ]]; then
             echo "An unknown error occurred."
             exit 1

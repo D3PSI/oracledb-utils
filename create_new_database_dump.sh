@@ -43,7 +43,8 @@ function main() {
     DB_DIR="${arg_tenant}_DUMP_${DATE}"
     export ORACLE_SID=$arg_service_id
     DB_SQLPLUS_START_SESSION="sqlplus / AS SYSDBA"
-    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY $DB_DIR as '"$OUT_DIR"';\nGRANT READ, WRITE ON DIRECTORY $DB_DIR TO EXP_FULL_DATABASE;\n"
+    DB_SQLPLUS_PREPARE_CMD_1="CREATE OR REPLACE DIRECTORY $DB_DIR as '"$OUT_DIR"';"
+    DB_SQLPLUS_PREPARE_CMD_2="GRANT READ, WRITE ON DIRECTORY $DB_DIR TO EXP_FULL_DATABASE;"
     DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=$DB_DIR dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
@@ -52,7 +53,8 @@ function main() {
         echo "Running on local machine"
         mkdir -p "$OUT_DIR"
         chown oracle:oinstall "$OUT_DIR"
-        eval "echo '"$DB_SQLPLUS_PREPARE_CMD"' | $DB_SQLPLUS_START_SESSION"
+        eval "echo '"$DB_SQLPLUS_PREPARE_CMD_1"' | $DB_SQLPLUS_START_SESSION"
+        eval "echo '"$DB_SQLPLUS_PREPARE_CMD_2"' | $DB_SQLPLUS_START_SESSION"
         if [[ $? -ne 0 ]]; then
             echo "An unknown error occurred. Check that the database user has 'EXP_FULL_DATABASE' role. You can give your database user this role by running the following in sqlplus:\n\n\t\tGRANT EXP_FULL_DATABASE TO $arg_tenant;"
             exit 1
