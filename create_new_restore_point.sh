@@ -46,10 +46,6 @@ function main() {
     else
         echo "Running on local machine"
         eval "echo '"$DB_SQLPLUS_CREATE_CMD"' | $DB_SQLPLUS_START_SESSION"
-        if [[ $? -ne 0 ]]; then
-            echo "An unknown error occurred."
-            exit 1
-        fi
     fi
 }
 

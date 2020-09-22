@@ -52,10 +52,6 @@ function main() {
         eval "echo '"$DB_SQLPLUS_RESTORE_CMD_2"' | $DB_SQLPLUS_START_SESSION"
         eval "echo '"$DB_SQLPLUS_RESTORE_CMD_3"' | $DB_SQLPLUS_START_SESSION"
         eval "echo '"$DB_SQLPLUS_RESTORE_CMD_4"' | $DB_SQLPLUS_START_SESSION"
-        if [[ $? -ne 0 ]]; then
-            echo "An unknown error occurred."
-            exit 1
-        fi
     fi
 }
 
