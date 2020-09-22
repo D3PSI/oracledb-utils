@@ -42,7 +42,7 @@ function main() {
     OUT_DIR="$arg_out/$DATE"
     export ORACLE_SID=$arg_service_id
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
-    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY ${arg_tenant}_DUMP_$DATE as "$OUT_DIR"; GRANT READ, WRITE ON DIRECTORY ${arg_tenant}_DUMP_$DATE TO EXP_FULL_DATABASE;"
+    DB_SQLPLUS_PREPARE_CMD="CREATE OR REPLACE DIRECTORY ${arg_tenant}_DUMP_$DATE as "$OUT_DIR";\nGRANT READ, WRITE ON DIRECTORY ${arg_tenant}_DUMP_$DATE TO EXP_FULL_DATABASE;\n"
     DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=${arg_tenant}_DUMP_$DATE dumpfile=data.dmp logfile=data.log"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
