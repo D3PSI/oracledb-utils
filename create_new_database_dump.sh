@@ -45,7 +45,7 @@ function main() {
     DB_SQLPLUS_START_SESSION="sqlplus / AS SYSDBA"
     DB_SQLPLUS_PREPARE_CMD_1="CREATE OR REPLACE DIRECTORY $DB_DIR as '\''$OUT_DIR'\'';"
     DB_SQLPLUS_PREPARE_CMD_2="GRANT READ, WRITE ON DIRECTORY $DB_DIR TO EXP_FULL_DATABASE;"
-    DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=$DB_DIR dumpfile=data.dmp logfile=data.log"
+    DB_DUMP_CMD="expdp $arg_tenant/$arg_tenant directory=$DB_DIR dumpfile=$arg_tenant.dmp logfile=$arg_tenant.log"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
