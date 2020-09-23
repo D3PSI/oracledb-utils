@@ -42,9 +42,11 @@ function main() {
     DATE=$(date +'%Y%m%d')
     OUT_DIR="$arg_out/$DATE/$arg_tenant"
     export ORACLE_SID=$arg_service_id
+    arg_tenant_UPPER=$(echo "$arg_tenant" | tr [a-z] [A-Z])
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
-    DB_SQLPLUS_GENERATE_PROCEDURE="@generate_csv_export_procedure.sql"
-    DB_SQLPLUS_DUMP_CMD="@create_csv_per_table.sql"
+    DB_SQLPLUS_START_SESSION_AS_SYSDBA="sqlplus / AS SYSDBA"
+    DB_SQLPLUS_CREATE_DIR="create or replace directory temp_dir_$DATE as '\''$OUT_DIR'\'';"
+    DB_SQLPLUS_DROP_DIR="drop directory temp_dir_$DATE;"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
@@ -52,10 +54,29 @@ function main() {
         echo "Running on local machine"
         mkdir -p "$OUT_DIR"
         chown oracle:oinstall "$OUT_DIR"
-        eval "$DB_SQLPLUS_START_SESSION $DB_SQLPLUS_GENERATE_PROCEDURE"
-        eval "$DB_SQLPLUS_START_SESSION $DB_SQLPLUS_DUMP_CMD"
-        mv *.csv "$OUT_DIR"
-        rm -rf create_csv_per_table.sql
+        eval "echo '"$DB_SQLPLUS_CREATE_DIR"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
+        eval "$DB_SQLPLUS_START_SESSION <<begin
+  for tables in
+  (
+    select
+      table_name || '.csv' file_name,
+      'select * from "' || owner || '"."' || table_name || '"' v_sql
+      from all_tables
+      where owner = '$arg_tenant_UPPER'
+      order by table_name
+  ) loop
+    data_dump
+    (
+      query_in        => tables.v_sql,
+      file_in         => tables.file_name,
+      directory_in    => 'TEMP_DIR_$DATE',
+      delimiter_in    => ',',
+      header_row_in   => true
+    );
+  end loop;
+end;
+/"
+        eval "echo '"$DB_SQLPLUS_DROP_DIR"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
     fi
 }
 
