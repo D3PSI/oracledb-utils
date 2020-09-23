@@ -40,7 +40,7 @@ _EOF_
 function main() {
     echo "Dumping complete database to local disk..."
     DATE=$(date +'%Y%m%d')
-    OUT_DIR="$arg_out/$DATE"
+    OUT_DIR="$arg_out/$DATE/$arg_tenant"
     export ORACLE_SID=$arg_service_id
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
     DB_SQLPLUS_GENERATE_PROCEDURE="@generate_csv_export_procedure.sql"
@@ -52,8 +52,10 @@ function main() {
         echo "Running on local machine"
         mkdir -p "$OUT_DIR"
         chown oracle:oinstall "$OUT_DIR"
-        eval "$DB_SQLPLUS_START_SESSION @$DB_SQLPLUS_GENERATE_PROCEDURE"
-        eval "$DB_SQLPLUS_START_SESSION @$DB_SQLPLUS_DUMP_CMD"
+        eval "$DB_SQLPLUS_START_SESSION $DB_SQLPLUS_GENERATE_PROCEDURE"
+        eval "$DB_SQLPLUS_START_SESSION $DB_SQLPLUS_DUMP_CMD"
+        mv *.csv "$OUT_DIR"
+        rm -rf create_csv_per_table.sql
     fi
 }
 
