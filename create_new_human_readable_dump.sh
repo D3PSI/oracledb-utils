@@ -25,7 +25,7 @@ Usage: $0 -s SID -d HOST -t TENANT -o OUT_DIR [OPTIONS]
         -d, --db-host       :           The database host to run the script against (Defaults to localhost if not specified)
         -t, --tenant        :           The tenant to run this script against (Mandatory)
         -o, --out           :           The out directory where the dump will be stored (Mandatory)
-        -e, --exclude       :           A comma-separated list of tables to exclude (Optional)
+        -e, --exclude       :           A comma-separated list of columns to exclude (Optional)
 
     Examples:
 
@@ -39,6 +39,7 @@ _EOF_
 
 function main() {
     echo "Dumping complete database to local disk..."
+    EXCLUDE_COLS="'$(echo "$arg_exclude" | tr "," "\',\'")'"
     DATE=$(date +'%Y%m%d')
     OUT_DIR="$arg_out/$DATE/$arg_tenant"
     export ORACLE_SID=$arg_service_id
@@ -62,19 +63,19 @@ function main() {
         eval "echo '"$DB_SQLPLUS_GRANT"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
         echo "
 begin
-  for tables in
+  for tab in
   (
     select
-      table_name || '.csv' file_name,
-      'select * from ' || owner || '.' || table_name v_sql
+      table_name || '.csv' file_name, wm_concat((select column_name from all_tab_columns where table_name = table_name and column_name not in ($EXCLUDE_COLS))) as column_names,
+      'select ' || column_names ||' from ' || owner || '.' || table_name v_sql
       from all_tables
       where owner = '$arg_tenant_UPPER'
       order by table_name
   ) loop
     data_dump
     (
-      query_in        => tables.v_sql,
-      file_in         => tables.file_name,
+      query_in        => tab.v_sql,
+      file_in         => tab.file_name,
       directory_in    => 'TEMP_DIR_$DATE',
       delimiter_in    => ',',
       header_row_in   => true
