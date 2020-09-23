@@ -45,6 +45,7 @@ function main() {
     arg_tenant_UPPER=$(echo "$arg_tenant" | tr [a-z] [A-Z])
     DB_SQLPLUS_START_SESSION="sqlplus $arg_tenant/$arg_tenant"
     DB_SQLPLUS_START_SESSION_AS_SYSDBA="sqlplus / AS SYSDBA"
+    DB_SQLPLUS_DATA_DUMP_UTIL="@external/data_dump/data_dump.sql"
     DB_SQLPLUS_CREATE_DIR="create or replace directory temp_dir_$DATE as '\''$OUT_DIR'\'';"
     DB_SQLPLUS_DROP_DIR="drop directory temp_dir_$DATE;"
     if [ "$arg_db_host" != "localhost" ]; then
@@ -54,6 +55,7 @@ function main() {
         echo "Running on local machine"
         mkdir -p "$OUT_DIR"
         chown oracle:oinstall "$OUT_DIR"
+        eval "$DB_SQLPLUS_START_SESSION_AS_SYSDBA $DB_SQLPLUS_DATA_DUMP_UTIL"
         eval "echo '"$DB_SQLPLUS_CREATE_DIR"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
         eval "$DB_SQLPLUS_START_SESSION <<begin
   for tables in
