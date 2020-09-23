@@ -6,7 +6,7 @@ set colsep ','
 set pages 0
 set feed off
 
-spool runme.sql
+spool create_csv_per_table.sql
 
 select 'set colsep '',''' from dual;
 select 'set lines 9999' from dual;
