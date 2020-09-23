@@ -66,15 +66,16 @@ begin
   for tab in
   (
     select
-      table_name || '.csv' file_name, wm_concat((select column_name from all_tab_columns where table_name = table_name and column_name not in ($EXCLUDE_COLS))) as column_names,
-      'select ' || column_names ||' from ' || owner || '.' || table_name v_sql
+      table_name || '.csv' file_name
       from all_tables
       where owner = '$arg_tenant_UPPER'
       order by table_name
   ) loop
+    with column_names as (select table_name, listagg(column_name, ',') within group (order by column_name) as names
+      from all_tab_columns where table_name = tab.table_name and column_name not in ($EXCLUDE_COLS) group by table_name);
     data_dump
     (
-      query_in        => tab.v_sql,
+      query_in        => 'select ' || column_names.names || ' from ' || table_name,
       file_in         => tab.file_name,
       directory_in    => 'TEMP_DIR_$DATE',
       delimiter_in    => ',',
