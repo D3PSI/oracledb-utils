@@ -47,7 +47,9 @@ function main() {
     DB_SQLPLUS_START_SESSION_AS_SYSDBA="sqlplus / AS SYSDBA"
     DB_SQLPLUS_DATA_DUMP_UTIL="@external/data_dump/data_dump.sql"
     DB_SQLPLUS_CREATE_DIR="create or replace directory temp_dir_$DATE as '\''$OUT_DIR'\'';"
+    DB_SQLPLUS_GRANT="grant read, write on directory temp_dir_$DATE to $arg_tenant;"
     DB_SQLPLUS_DROP_DIR="drop directory temp_dir_$DATE;"
+    DB_SQLPLUS_EXPORT="@export.sql"
     if [ "$arg_db_host" != "localhost" ]; then
         echo "Database is not hosted on local machine, this functionality has not yet been implemented"
         exit 1
@@ -55,14 +57,16 @@ function main() {
         echo "Running on local machine"
         mkdir -p "$OUT_DIR"
         chown oracle:oinstall "$OUT_DIR"
-        eval "$DB_SQLPLUS_START_SESSION_AS_SYSDBA $DB_SQLPLUS_DATA_DUMP_UTIL"
+        eval "echo 'exit;' | $DB_SQLPLUS_START_SESSION $DB_SQLPLUS_DATA_DUMP_UTIL"
         eval "echo '"$DB_SQLPLUS_CREATE_DIR"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
-        eval "$DB_SQLPLUS_START_SESSION <<begin
+        eval "echo '"$DB_SQLPLUS_GRANT"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
+        echo "
+begin
   for tables in
   (
     select
       table_name || '.csv' file_name,
-      'select * from "' || owner || '"."' || table_name || '"' v_sql
+      'select * from ' || owner || '.' || table_name v_sql
       from all_tables
       where owner = '$arg_tenant_UPPER'
       order by table_name
@@ -77,8 +81,11 @@ function main() {
     );
   end loop;
 end;
-/"
+/
+exit" > export.sql
+        eval "$DB_SQLPLUS_START_SESSION $DB_SQLPLUS_EXPORT"
         eval "echo '"$DB_SQLPLUS_DROP_DIR"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
+        rm -rf export.sql
     fi
 }
 
