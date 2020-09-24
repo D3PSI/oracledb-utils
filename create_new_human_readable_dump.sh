@@ -68,16 +68,17 @@ begin
   for tab in
   (
     select
-      table_name || '.csv' file_name
+      table_name || '.csv' file_name,
+      table_name
       from all_tables
       where owner = '$arg_tenant_UPPER'
       order by table_name
   ) loop
     select listagg(column_name, ',') within group (order by column_name) into v_column_names
-      from all_tab_columns where table_name = tab.table_name and column_name not in ($EXCLUDE_COLS) group by table_name);
+      from user_tab_columns where table_name = tab.table_name and column_name not in ($EXCLUDE_COLS) group by table_name;
     data_dump
     (
-      query_in        => 'select ' || v_column_names || ' from ' || table_name,
+      query_in        => 'select ' || v_column_names || ' from ' || tab.table_name,
       file_in         => tab.file_name,
       directory_in    => 'TEMP_DIR_$DATE',
       delimiter_in    => ',',
