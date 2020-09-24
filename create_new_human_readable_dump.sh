@@ -62,8 +62,6 @@ function main() {
         eval "echo '"$DB_SQLPLUS_CREATE_DIR"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
         eval "echo '"$DB_SQLPLUS_GRANT"' | $DB_SQLPLUS_START_SESSION_AS_SYSDBA"
         echo "
-declare
-  var v_column_names varchar(8000);
 begin
   for tab in
   (
@@ -73,12 +71,11 @@ begin
       where owner = '$arg_tenant_UPPER'
       order by table_name
   ) loop
-    select table_name, listagg(column_name, ',') within group (order by column_name) as names
-      from all_tab_columns where table_name = tab.table_name and column_name not in ($EXCLUDE_COLS) group by table_name
-      into :v_column_names;
+    with column_names as (select table_name, listagg(column_name, ',') within group (order by column_name) names
+      from all_tab_columns where table_name = tab.table_name and column_name not in ($EXCLUDE_COLS) group by table_name),
     data_dump
     (
-      query_in        => 'select ' || v_column_names.names || ' from ' || table_name,
+      query_in        => 'select ' || column_names.names || ' from ' || table_name,
       file_in         => tab.file_name,
       directory_in    => 'TEMP_DIR_$DATE',
       delimiter_in    => ',',
